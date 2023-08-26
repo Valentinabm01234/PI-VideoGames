@@ -1,3 +1,10 @@
+body{
+        background-image: url('../../img/landing.jpg');
+        background-size: cover;
+        background-repeat: no-repeat; 
+        background-position: center;
+    }
+
 .navbar-div {
 
         display: flex;

@@ -1,3 +1,10 @@
+.div-foto {
+    display: flex;
+    justify-content: center;
+    background: #fff url('../../img/estampados.jpg') center center/cover no-repeat;
+
+}
+
 .container-about {
     margin-top: 40px;
     font-family: 'Press Start 2P';

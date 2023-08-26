@@ -1,3 +1,12 @@
+.MyImage{
+  display: flex;
+  flex-direction: row;
+  background-image: url('../../img/75zW.gif');
+  background-size: cover;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+}
 
  .myButton{
       position: absolute;

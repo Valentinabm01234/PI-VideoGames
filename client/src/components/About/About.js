@@ -1,6 +1,5 @@
 import React from 'react'
 import NavBar from '../NavBar/NavBar'
-import imagen from '../../img/videogame.png'
 import './about.css'
 
 
@@ -8,11 +7,10 @@ function About() {
     return (
         <>
         <NavBar />
+        <div className="div-foto">
         <div className="container-about">
-            <h1>Individual Project</h1>
+            <h1>INDIVIDUAL PROJECT</h1>
             <h1>Valentina Barros Marchesi</h1>
-            <div className="div-foto">
-               <img src={imagen} alt="foto"></img>
             </div>
         </div>
         </>
