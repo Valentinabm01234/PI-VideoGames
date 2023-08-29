@@ -17,6 +17,8 @@ function CrearJuego(props) {
     });
 
     const handleChange = e => {
+        // Maneja los cambios en los campos del formulario y actualiza el estado correspondiente.
+        // También realiza validaciones en tiempo real llamando a la función "validate".
         if (e.target.parentNode.parentNode.id === 'genres') {
             if (e.target.checked) {
                 setForm(prevState => ({
@@ -55,6 +57,7 @@ function CrearJuego(props) {
         }))
     }
     const validate = form => {
+         // Realiza validaciones en los campos del formulario y devuelve un objeto con los errores.
         let errors = {};
         if (!form.name) {
             errors.name = 'Game Name is required';
@@ -75,25 +78,48 @@ function CrearJuego(props) {
     }
 
     const handleSubmit = e => {
-        e.preventDefault()
-        validate(form);
-        let checkboxsErrors = []
+        e.preventDefault(); // Evita que el formulario se envíe de manera convencional y recargue la página.
+        const formErrors = validate(form); // Realiza validaciones en los campos del formulario.
+        let checkboxsErrors = [];
+        
+        // Verifica si hay al menos un género seleccionado.
         if (form.genres.length < 1) checkboxsErrors.push('Genres is required');
+        // Verifica si hay al menos una plataforma seleccionada.
         if (form.platforms.length < 1) checkboxsErrors.push('Platforms is required');
-        if (Object.values(errors).length || checkboxsErrors.length) { // Object.values --> retorno un array con los values
-            return alert(Object.values(errors).concat(checkboxsErrors).join('\n'));
+    
+         // Comprueba si hay errores de validación en los campos o en las checkboxes.
+        if (Object.keys(formErrors).length || checkboxsErrors.length) {
+            const allErrors = { ...formErrors };
+             // Agrega los errores de checkboxes al objeto de errores.
+            checkboxsErrors.forEach((error, index) => {
+                allErrors[`checkboxError${index}`] = error;
+            });
+            setErrors(allErrors);// Actualiza el estado de "errors" con los errores encontrados.
+            return;
         }
-        axios.post('https://video-games-pi-henry-api.vercel.app//videogame', form)
-                  .then(res => console.log(res.data));
-        alert(`${form.name} Creado Correctamente`)
-        props.history.push('/videogames') 
-    }
+    
+        // Si no hay errores en la validación, procede con la solicitud POST
+        axios.post('https://video-games-pi-henry-api.vercel.app/videogame', form)
+            .then(res => {
+                console.log(res.data);
+                alert(`${form.name} Creado Correctamente`);
+                props.history.push('/videogames');
+            })
+            .catch(error => {
+                console.error('Error en la solicitud POST:', error);
+            // Muestra el error en la consola.
+            // Puedes mostrar un mensaje de error al usuario si la solicitud falla.
+            // Por ejemplo: alert("Hubo un error al crear el juego. Por favor, intenta nuevamente.");
+            });
+    };
 
     return (
         <>
+          {/* Renderiza la barra de navegación */}
         <NavBar />
         <div className="main-add">
             <div className="container-add">
+                  {/* Formulario para crear un nuevo juego */}
                 <h2>CREATE GAME - DETAILS -</h2>
                 <div className="div-cont">
                     <form onSubmit={handleSubmit} onChange={handleChange}>
@@ -224,4 +250,4 @@ function CrearJuego(props) {
 }
 
 
-export default CrearJuego
+export default CrearJuego;

@@ -18,4 +18,4 @@ function About() {
 }
 
 export default About
-
+//Este componente representa la página "Acerca de" que muestra información sobre el proyecto y su autor
