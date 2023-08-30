@@ -4,58 +4,47 @@ import axios from 'axios'
 import './CrearJuego.css'
 
 function CrearJuego(props) {
-
+     // Estado para almacenar los errores del formulario
     const [errors, setErrors] = useState({ form: 'Must complete the form' });
-
+      // Estado para almacenar los datos del formulario
     const [form, setForm] = useState({
         name: '',
         description: '',
         releaseDate: '',
-        rating: 0,
+        rating: '',
         genres: [],
         platforms: []
     });
 
+     // Función para manejar los cambios en los campos del formulario
     const handleChange = e => {
-        // Maneja los cambios en los campos del formulario y actualiza el estado correspondiente.
-        // También realiza validaciones en tiempo real llamando a la función "validate".
-        if (e.target.parentNode.parentNode.id === 'genres') {
-            if (e.target.checked) {
+        const { name, value, type, checked } = e.target;
+        //agrega o elimina valores de la lista de géneros y plataformas
+        if (type === 'checkbox') {
+            if (checked) {
                 setForm(prevState => ({
                     ...prevState,
-                    genres: form.genres.concat(e.target.value)
-                }))
+                    [name]: [...prevState[name], value]
+                }));
             } else {
                 setForm(prevState => ({
                     ...prevState,
-                    genres: form.genres.filter(x => e.target.value !== x)
-                }))
+                    [name]: prevState[name].filter(item => item !== value)
+                }));
             }
-        }
-        if (e.target.parentNode.parentNode.id === 'platforms') {
-            if (e.target.checked) {
-                setForm(prevState => ({
-                    ...prevState,
-                    platforms: form.platforms.concat(e.target.name)
-                }))
-            } else {
-                setForm(prevState => ({
-                    ...prevState,
-                    platforms: form.platforms.filter(x => e.target.name !== x)
-                }))
-            }
-        }
-        if (e.target.type !== 'checkbox') {
+        } else {
+            // Manejo de otros campos: actualiza el valor en el estado
             setForm(prevState => ({
                 ...prevState,
-                [e.target.name]: e.target.value
-            }))
+                [name]: value
+            }));
         }
+         // Realiza validaciones en tiempo real y actualiza los errores
         setErrors(validate({
             ...form,
-            [e.target.name]: e.target.value
-        }))
-    }
+            [name]: value
+        }));
+    };
     const validate = form => {
          // Realiza validaciones en los campos del formulario y devuelve un objeto con los errores.
         let errors = {};
@@ -77,39 +66,27 @@ function CrearJuego(props) {
         return errors;
     }
 
+    // Función para manejar el envío del formulario
     const handleSubmit = e => {
-        e.preventDefault(); // Evita que el formulario se envíe de manera convencional y recargue la página.
-        const formErrors = validate(form); // Realiza validaciones en los campos del formulario.
-        let checkboxsErrors = [];
-        
-        // Verifica si hay al menos un género seleccionado.
-        if (form.genres.length < 1) checkboxsErrors.push('Genres is required');
-        // Verifica si hay al menos una plataforma seleccionada.
-        if (form.platforms.length < 1) checkboxsErrors.push('Platforms is required');
-    
-         // Comprueba si hay errores de validación en los campos o en las checkboxes.
-        if (Object.keys(formErrors).length || checkboxsErrors.length) {
-            const allErrors = { ...formErrors };
-             // Agrega los errores de checkboxes al objeto de errores.
-            checkboxsErrors.forEach((error, index) => {
-                allErrors[`checkboxError${index}`] = error;
-            });
-            setErrors(allErrors);// Actualiza el estado de "errors" con los errores encontrados.
+        e.preventDefault();
+
+         // Validar el formulario y checkboxes antes de enviar
+        const formErrors = validate(form);
+        if (Object.keys(formErrors).length || form.genres.length < 1 || form.platforms.length < 1) {
+            setErrors({ ...formErrors, checkboxError: 'At least one genre and platform are required' });
             return;
         }
-    
-        // Si no hay errores en la validación, procede con la solicitud POST
+
+        // Enviar el formulario al servidor mediante una solicitud POST
         axios.post('https://video-games-pi-henry-api.vercel.app/videogame', form)
             .then(res => {
                 console.log(res.data);
-                alert(`${form.name} Creado Correctamente`);
+                alert(`${form.name} created successfully`);
                 props.history.push('/videogames');
             })
             .catch(error => {
-                console.error('Error en la solicitud POST:', error);
-            // Muestra el error en la consola.
-            // Puedes mostrar un mensaje de error al usuario si la solicitud falla.
-            // Por ejemplo: alert("Hubo un error al crear el juego. Por favor, intenta nuevamente.");
+                console.error('Error in POST request:', error);
+                alert("An error occurred while creating the game. Please try again.");
             });
     };
 
